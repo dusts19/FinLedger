@@ -48,7 +48,7 @@ public class MoneyTest {
     @Test
     void testZero() {
         Money zero = Money.zero(USD);
-        assertEquals(BigDecimal.ZERO, zero.amount());
+        assertEquals(BigDecimal.ZERO.setScale(2), zero.amount());
         assertEquals(USD, zero.currency());
     }
 

@@ -19,7 +19,7 @@ public class AccountIdTest {
 
     @Test
     void no_arg_constructor_generates_non_null_uuid() {
-        AccountId accountId = new AccountId();
+        AccountId accountId = AccountId.newId();
 
         assertNotNull(accountId.id());
     }
@@ -27,14 +27,14 @@ public class AccountIdTest {
     @Test
     void string_constructor_parses_valid_uuid() {
         UUID uuid = UUID.randomUUID();
-        AccountId accountId = new AccountId(uuid.toString());
+        AccountId accountId = AccountId.fromString(uuid.toString());
         assertEquals(uuid, accountId.id());
     }
 
     @Test
-    void string_constructor_with_invalid_uuid_throws_exception() {
+    void fromString_with_invalid_uuid_throws_exception() {
         assertThrows(IllegalArgumentException.class, () -> {
-            new AccountId("not-a-valid-uuid");
+            AccountId.fromString("not-a-valid-uuid");
         });
     }
 }

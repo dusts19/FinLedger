@@ -11,7 +11,7 @@ public class AccountTest {
     
     @Test
     void accountCreationValid() {
-        Account account = new Account(new AccountId(), "Checking", AccountType.ASSET);
+        Account account = new Account(AccountId.newId(), "Checking", AccountType.ASSET);
 
         assertEquals("Checking", account.getName());
         assertEquals(AccountType.ASSET, account.getType());
@@ -21,13 +21,13 @@ public class AccountTest {
     @Test
     void accountCreationBlankNameThrows() {
         assertThrows(DomainException.class, () -> {
-            new Account(new AccountId(), "", AccountType.ASSET);
+            new Account(AccountId.newId(), "", AccountType.ASSET);
         });
     }
 
     @Test
     void freezeThenCloseThrows() {
-        Account account = new Account(new AccountId(), "Checking", AccountType.ASSET);
+        Account account = new Account(AccountId.newId(), "Checking", AccountType.ASSET);
         account.freeze();
         assertEquals(AccountStatus.FROZEN, account.getStatus());
         assertThrows(DomainException.class, account::close);
@@ -35,7 +35,7 @@ public class AccountTest {
 
     @Test
     void ensureCanPostFailsForFrozen() {
-        Account account = new Account(new AccountId(), "Checking", AccountType.ASSET);
+        Account account = new Account(AccountId.newId(), "Checking", AccountType.ASSET);
         account.freeze();
         assertThrows(DomainException.class, account::ensureCanPost);
 

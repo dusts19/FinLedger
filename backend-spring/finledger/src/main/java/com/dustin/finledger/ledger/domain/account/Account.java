@@ -62,6 +62,11 @@ public class Account {
         return status;
     }
 
+    /**
+     * Freezes the account. A frozen account cannot post transactions.
+     * 
+     * @throws DomainException if the account is already CLOSED
+     */
     public void freeze() {
         if (status == AccountStatus.CLOSED) {
             throw new DomainException("Cannot freeze a closed account");
@@ -69,6 +74,11 @@ public class Account {
         this.status = AccountStatus.FROZEN;
     }
 
+    /**
+     * Closes the account. A closed account cannot be frozen or post transactions.
+     * 
+     * @throws DomainException if the account is already FROZEN
+     */
     public void close() {
         if (status == AccountStatus.FROZEN) {
             throw new DomainException("Cannot close a frozen account");
@@ -76,6 +86,11 @@ public class Account {
         this.status = AccountStatus.CLOSED;
     }
 
+    /**
+     *  Ensures the account can accept postings (i.e., is OPEN).
+     * 
+     * @throws DomainException if the account is not OPEN
+     */
     public void ensureCanPost() {
         if (status != AccountStatus.OPEN) {
             throw new DomainException("Cannot post to account with status: " + status);
