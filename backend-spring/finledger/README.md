@@ -24,5 +24,5 @@ Run all backend tests:
     `mvn test`
 
 ## Notes
-Ledger transactions follow double-entry accounting rules (debits = credits).
-The backend uses domain-driven design principles.
+- Ledger transactions follow double-entry accounting rules (debits = credits).
+- The backend uses domain-driven design principles.

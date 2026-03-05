@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.dustin.finledger.ledger.domain.transaction.EntrySide;
+import com.dustin.finledger.ledger.domain.journal.EntrySide;
 
 public class AccountTypeTest {
 

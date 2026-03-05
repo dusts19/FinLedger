@@ -1,4 +1,4 @@
-package com.dustin.finledger.ledger.domain.transaction;
+package com.dustin.finledger.ledger.domain.journal;
 
 import com.dustin.finledger.common.money.Money;
 import com.dustin.finledger.ledger.domain.account.AccountId;
@@ -18,22 +18,22 @@ import java.util.Objects;
  * - id, accountId, amount, occurredAt, side are non-null
  * - occurredAt is not in the future
  */
-public record LedgerEntry(
-    LedgerEntryId id,
+public record JournalLine(
+    JournalLineId id,
     AccountId accountId,
     Money amount,
     Instant occurredAt,
     EntrySide side
 ) {
-    public LedgerEntry {
-        Objects.requireNonNull(id, "LedgerEntry id cannot be null");
-        Objects.requireNonNull(accountId, "LedgerEntry accountId cannot be null");
-        Objects.requireNonNull(amount, "LedgerEntry amount cannot be null");
-        Objects.requireNonNull(occurredAt, "LedgerEntry occurredAt cannot be null");
-        Objects.requireNonNull(side, "LedgerEntry side cannot be null");
+    public JournalLine {
+        Objects.requireNonNull(id, "JournalLine id cannot be null");
+        Objects.requireNonNull(accountId, "JournalLine accountId cannot be null");
+        Objects.requireNonNull(amount, "JournalLine amount cannot be null");
+        Objects.requireNonNull(occurredAt, "JournalLine occurredAt cannot be null");
+        Objects.requireNonNull(side, "JournalLine side cannot be null");
 
         if (occurredAt.isAfter(Instant.now())) {
-            throw new IllegalArgumentException("LedgerEntry cannot occur in the future");
+            throw new IllegalArgumentException("JournalLine cannot occur in the future");
         }
     }
 }

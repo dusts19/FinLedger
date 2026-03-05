@@ -1,5 +1,6 @@
 package com.dustin.finledger.ledger.domain.account;
 
+import java.util.Currency;
 import java.util.Objects;
 
 import com.dustin.finledger.common.exceptions.DomainException;
@@ -34,15 +35,21 @@ public class Account {
     private final AccountId id;
     private final String name;
     private final AccountType type;
+    private final Currency currency;
     private AccountStatus status;
 
-    public Account(AccountId id, String name, AccountType type) {
+    public static Account create(String name, AccountType type, Currency currency) {
+        return new Account(AccountId.newId(), name, type, currency);
+    }
+
+    public Account(AccountId id, String name, AccountType type, Currency currency) {
         if (name == null || name.isBlank()) {
             throw new DomainException("Account name cannot be empty");
         }
         this.id = Objects.requireNonNull(id);
         this.name = name;
         this.type = Objects.requireNonNull(type);
+        this.currency = Objects.requireNonNull(currency);
         this.status = AccountStatus.OPEN;
     }
 
@@ -56,6 +63,10 @@ public class Account {
 
     public AccountType getType() {
         return type;
+    }
+
+    public Currency getCurrency() {
+        return currency;
     }
 
     public AccountStatus getStatus() {

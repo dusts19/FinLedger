@@ -1,6 +1,6 @@
 package com.dustin.finledger.ledger.domain.account;
 
-import com.dustin.finledger.ledger.domain.transaction.EntrySide;
+import com.dustin.finledger.ledger.domain.journal.EntrySide;
 
 /**
  * Represents the accouting type of an account.

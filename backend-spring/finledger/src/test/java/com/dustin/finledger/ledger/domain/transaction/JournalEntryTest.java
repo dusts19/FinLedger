@@ -18,143 +18,149 @@ import com.dustin.finledger.common.exceptions.DomainException;
 import com.dustin.finledger.common.money.Money;
 import com.dustin.finledger.ledger.domain.account.AccountId;
 // import com.dustin.finledger.ledger.domain.transaction.LedgerEntry;
+import com.dustin.finledger.ledger.domain.journal.EntrySide;
+import com.dustin.finledger.ledger.domain.journal.JournalEntry;
+import com.dustin.finledger.ledger.domain.journal.JournalEntryId;
+import com.dustin.finledger.ledger.domain.journal.JournalInvariantViolation;
+import com.dustin.finledger.ledger.domain.journal.JournalLine;
+import com.dustin.finledger.ledger.domain.journal.JournalLineId;
 
-class TransactionTest {
+class JournalEntryTest {
     
     @Nested
     class ConstructorTests{
         @Test
         void transactionConstructorSetsFieldsCorrectly() {
-            TransactionId id = TransactionId.newId();
+            JournalEntryId id = JournalEntryId.newId();
             String desc = "Test transaction";
 
-            Transaction tx = new Transaction(id, desc);
+            JournalEntry tx = new JournalEntry(id, desc);
             
             assertEquals(id, tx.getId());
             assertEquals(desc, tx.getDescription());
             assertFalse(tx.isPosted());
-            assertTrue(tx.getEntries().isEmpty());
+            assertTrue(tx.getLines().isEmpty());
             assertNotNull(tx.getTimestamp());
         }
 
         @Test
         void transactionConstructorNullIdThrows() {
             assertThrows(NullPointerException.class, () -> {
-                new Transaction(null, "desc");
+                new JournalEntry(null, "desc");
             });
         };
 
         @Test
         void transactionConstructorNullDescriptionThrows() {
-            TransactionId id = TransactionId.newId();
-            assertThrows(NullPointerException.class, () -> new Transaction(id, null));
+            JournalEntryId id = JournalEntryId.newId();
+            assertThrows(NullPointerException.class, () -> new JournalEntry(id, null));
         }
     }
     
     @Nested
-    class AddEntryTests {
+    class addLineTests {
         @Test
         void addingEntryBeforePostingSucceeds() {
-            TransactionId txId = TransactionId.newId();
-            Transaction tx = new Transaction(txId, "Normal transaction");
+            JournalEntryId txId = JournalEntryId.newId();
+            JournalEntry tx = new JournalEntry(txId, "Normal transaction");
 
             AccountId accountId = AccountId.newId();
             Money amount = new Money(new BigDecimal("100.00"), Currency.getInstance("USD"));
-            LedgerEntry entry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine entry = new JournalLine(
+                JournalLineId.newId(),
                 accountId,
                 amount,
                 Instant.now(),
                 EntrySide.DEBIT
             );
 
-            tx.addEntry(entry);
+            tx.addLine(entry);
 
-            assertEquals(1, tx.getEntries().size());
-            assertSame(entry, tx.getEntries().get(0));
+            assertEquals(1, tx.getLines().size());
+            assertSame(entry, tx.getLines().get(0));
         }
 
         @Test
         void addingEntryAfterPostingThrows() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Post check");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Post check");
 
-            LedgerEntry entry1 = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine entry1 = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("50.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
 
-            tx.addEntry(entry1);
+            tx.addLine(entry1);
             tx.post();
 
-            LedgerEntry entry2 = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine entry2 = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("50.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.CREDIT
             );
 
-            assertThrows(DomainException.class, () -> tx.addEntry(entry2));
+            assertThrows(DomainException.class, () -> tx.addLine(entry2));
         }   
         
         @Test
         void addingEntryWithFutureTimeStampThrows() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Future timestamp test");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Future timestamp test");
 
-            LedgerEntry futureEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine futureEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now().plusSeconds(3600),
                 EntrySide.DEBIT
             );
-            assertThrows(LedgerInvariantViolation.class, () -> tx.addEntry(futureEntry));
+            assertThrows(JournalInvariantViolation.class, () -> tx.addLine(futureEntry));
         }
 
         @Test
         void addingEntryWithCurrencyMismatchThrows() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Currency Mismatch");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Currency Mismatch");
 
-            LedgerEntry entry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine entry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            tx.addEntry(entry);
-            LedgerEntry mismatchEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            tx.addLine(entry);
+            JournalLine mismatchEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("EUR")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            assertThrows(LedgerInvariantViolation.class, () -> tx.addEntry(mismatchEntry));
+            assertThrows(JournalInvariantViolation.class, () -> tx.addLine(mismatchEntry));
         }
         @Test
         void addingDuplicateEntryIdThrows() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Currency Mismatch");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Currency Mismatch");
 
-            LedgerEntry entry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine entry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            tx.addEntry(entry);
-            LedgerEntry duplicateIdEntry = new LedgerEntry(
+            tx.addLine(entry);
+            JournalLine duplicateIdEntry = new JournalLine(
                 entry.id(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("EUR")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            assertThrows(LedgerInvariantViolation.class, () -> tx.addEntry(duplicateIdEntry));
+            assertThrows(JournalInvariantViolation.class, () -> tx.addLine(duplicateIdEntry));
         }
     }
 
@@ -163,25 +169,25 @@ class TransactionTest {
     class PostTests {
         @Test
         void postBalancedTransactionSucceeds() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Balanced transaction");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Balanced transaction");
 
-            LedgerEntry debitEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine debitEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            LedgerEntry creditEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine creditEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.CREDIT
             );
 
-            tx.addEntry(debitEntry);
-            tx.addEntry(creditEntry);
+            tx.addLine(debitEntry);
+            tx.addLine(creditEntry);
             tx.post();
             assertTrue(tx.isPosted());
 
@@ -189,64 +195,64 @@ class TransactionTest {
 
         @Test
         void postUnbalancedTransactionThrows() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Balanced transaction");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Balanced transaction");
 
-            LedgerEntry debitEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine debitEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            LedgerEntry creditEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine creditEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.CREDIT
             );
             
-            tx.addEntry(debitEntry);
-            tx.addEntry(creditEntry);
-            assertThrows(LedgerInvariantViolation.class, tx::post);
+            tx.addLine(debitEntry);
+            tx.addLine(creditEntry);
+            assertThrows(JournalInvariantViolation.class, tx::post);
         }
         @Test
         void totalDebitsAndCreditsComputeCorrectly() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Balanced transaction");
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Balanced transaction");
 
-            LedgerEntry debitEntry1 = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine debitEntry1 = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            LedgerEntry debitEntry2 = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine debitEntry2 = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("50.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            LedgerEntry creditEntry1 = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine creditEntry1 = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("120.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.CREDIT
             );
-            LedgerEntry creditEntry2 = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine creditEntry2 = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("30.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.CREDIT
             );
             
-            tx.addEntry(debitEntry1);
-            tx.addEntry(debitEntry2);
-            tx.addEntry(creditEntry1);
-            tx.addEntry(creditEntry2);
+            tx.addLine(debitEntry1);
+            tx.addLine(debitEntry2);
+            tx.addLine(creditEntry1);
+            tx.addLine(creditEntry2);
             
             Money totalDebits = tx.getTotalDebits();
             Money totalCredits = tx.getTotalCredits();
@@ -261,47 +267,47 @@ class TransactionTest {
     class ReverseTests {
         @Test
         void reversingUnpostedTransactionThrows() {
-            Transaction tx = new Transaction(TransactionId.newId(), "Test transaction");
-            LedgerEntry entry = new LedgerEntry(LedgerEntryId.newId(), AccountId.newId(), new Money(new BigDecimal("100.00"), Currency.getInstance("USD")), Instant.now(), EntrySide.DEBIT);
-            tx.addEntry(entry);
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Test transaction");
+            JournalLine entry = new JournalLine(JournalLineId.newId(), AccountId.newId(), new Money(new BigDecimal("100.00"), Currency.getInstance("USD")), Instant.now(), EntrySide.DEBIT);
+            tx.addLine(entry);
 
-            assertThrows(DomainException.class, () -> tx.reverse(TransactionId.newId()));
+            assertThrows(DomainException.class, () -> tx.reverse(JournalEntryId.newId()));
         }
 
         @Test
         void reverseFlipsAllEntriesAndPosts() {
-            TransactionId reversalId = TransactionId.newId();
-            Transaction tx = new Transaction(TransactionId.newId(), "Original tx");
+            JournalEntryId reversalId = JournalEntryId.newId();
+            JournalEntry tx = new JournalEntry(JournalEntryId.newId(), "Original tx");
 
             
-            LedgerEntry debitEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine debitEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.DEBIT
             );
-            LedgerEntry creditEntry = new LedgerEntry(
-                LedgerEntryId.newId(),
+            JournalLine creditEntry = new JournalLine(
+                JournalLineId.newId(),
                 AccountId.newId(),
                 new Money(new BigDecimal("100.00"), Currency.getInstance("USD")),
                 Instant.now(),
                 EntrySide.CREDIT
             );
             
-            tx.addEntry(debitEntry);
-            tx.addEntry(creditEntry);
+            tx.addLine(debitEntry);
+            tx.addLine(creditEntry);
             tx.post();
 
-            Transaction reversal = tx.reverse(reversalId);
+            JournalEntry reversal = tx.reverse(reversalId);
 
             assertEquals(reversalId, reversal.getId());
             assertEquals("Reversal of: " + tx.getDescription(), reversal.getDescription());
             assertTrue(reversal.isPosted());
 
-            for (int i = 0; i < tx.getEntries().size(); i++) {
-                LedgerEntry original = tx.getEntries().get(i);
-                LedgerEntry reversedEntry = reversal.getEntries().get(i);
+            for (int i = 0; i < tx.getLines().size(); i++) {
+                JournalLine original = tx.getLines().get(i);
+                JournalLine reversedEntry = reversal.getLines().get(i);
 
                 assertEquals(original.accountId(), reversedEntry.accountId());
                 assertEquals(original.amount(), reversedEntry.amount());
@@ -309,7 +315,7 @@ class TransactionTest {
                 EntrySide expectedFlipped = original.side() == EntrySide.DEBIT ? EntrySide.CREDIT : EntrySide.DEBIT;
                 assertEquals(expectedFlipped, reversedEntry.side());
 
-                assertEquals(original.side(), tx.getEntries().get(i).side());
+                assertEquals(original.side(), tx.getLines().get(i).side());
             }
         }
 

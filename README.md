@@ -33,7 +33,7 @@ This project emphasizes **clean architecture**, **domain modeling**, and **finte
 
 
 ## Notes
-All backend logic is fully tested via unit and integration tests.
-Backend follows domain-driven design with strong emphasis on immutability and validation.
+- All backend logic is fully tested via unit and integration tests.
+- Backend follows domain-driven design with strong emphasis on immutability and validation.
 
 Refer to each folder for more details.

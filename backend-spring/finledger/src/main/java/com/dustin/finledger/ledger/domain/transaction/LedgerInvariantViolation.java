@@ -1,7 +1,0 @@
-package com.dustin.finledger.ledger.domain.transaction;
-
-public class LedgerInvariantViolation extends RuntimeException {
-    public LedgerInvariantViolation(String message) {
-        super(message);
-    }
-}
