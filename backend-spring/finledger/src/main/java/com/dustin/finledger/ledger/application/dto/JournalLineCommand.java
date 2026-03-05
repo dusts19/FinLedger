@@ -2,10 +2,11 @@ package com.dustin.finledger.ledger.application.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.UUID;
+
+import com.dustin.finledger.ledger.domain.account.AccountId;
 
 public record JournalLineCommand (
-    UUID accountId,
+    AccountId accountId,
     BigDecimal amount,
     String currency,
     String side,

@@ -2,7 +2,7 @@ package com.dustin.finledger.ledger.infrastructure.persistence;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-// import java.util.List;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -39,24 +39,36 @@ public class JpaJournalEntryRepository implements JournalEntryRepository{
         return Optional.of(entity.toDomain());
     };
 
-    // Old way
-    // @Override
-    // public List<JournalEntry> findAllPostedByAccountId(AccountId accountId) {
+    @Override
+    public List<JournalEntry> findAllPostedByAccountId(AccountId accountId) {
         
-    //     List<JournalEntryEntity> entities = em.createQuery("""
-    //         SELECT DISTINCT je
-    //         FROM JournalEntryEntity je
-    //         JOIN je.lines jl
-    //         WHERE jl.accountId = :accountId
-    //         AND je.posted = true
-    //     """, JournalEntryEntity.class)
-    //     .setParameter("accountId", accountId.id())
-    //     .getResultList();
+        List<JournalEntryEntity> entities = em.createQuery("""
+            SELECT DISTINCT je
+            FROM JournalEntryEntity je
+            JOIN je.lines jl
+            WHERE jl.accountId = :accountId
+            AND je.posted = true
+        """, JournalEntryEntity.class)
+        .setParameter("accountId", accountId.id())
+        .getResultList();
         
-    //     return entities.stream()
-    //             .map(JournalEntryEntity::toDomain)
-    //             .toList();
-    // }
+        return entities.stream()
+                .map(JournalEntryEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<JournalEntry> findAll() {
+        List<JournalEntryEntity> entities = em.createQuery("""
+                SELECT je
+                FROM JournalEntryEntity je
+                WHERE je.posted = true
+                """, JournalEntryEntity.class)
+                .getResultList();
+        return entities.stream()
+                .map(JournalEntryEntity::toDomain)
+                .toList();
+    }
 
     @Override
     public Money getAccountBalance(AccountId accountId, Currency currency) {
@@ -66,7 +78,7 @@ public class JpaJournalEntryRepository implements JournalEntryRepository{
                 WHERE j.posted = true
                 AND l.accountId = :accountId
                 AND l.amount.currencyCode = :currencyCode
-                And l.side = :debit
+                AND l.side = :debit
                 """, BigDecimal.class
         )
         .setParameter("accountId", accountId.id())
@@ -80,7 +92,7 @@ public class JpaJournalEntryRepository implements JournalEntryRepository{
                 WHERE j.posted = true
                 AND l.accountId = :accountId
                 AND l.amount.currencyCode = :currencyCode
-                And l.side = :credit
+                AND l.side = :credit
                 """, BigDecimal.class
         )
         .setParameter("accountId", accountId.id())

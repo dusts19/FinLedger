@@ -27,14 +27,18 @@ public record JournalEntryId(UUID id) {
     public JournalEntryId {
         Objects.requireNonNull(id, "JournalEntryId cannot be null");
     }
-
+    
     /**
      * Generates a new unique journal entry ID.
      * 
      * @return a new {@code JournalEntryId} with a randomly generated UUID
-     */
-    public static JournalEntryId newId() {
-        return new JournalEntryId(UUID.randomUUID());
+    */
+   public static JournalEntryId newId() {
+       return new JournalEntryId(UUID.randomUUID());
+    }
+
+    public static JournalEntryId of(UUID id) {
+        return new JournalEntryId(id);
     }
 
     /**

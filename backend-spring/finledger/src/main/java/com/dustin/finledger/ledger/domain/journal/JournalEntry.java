@@ -2,7 +2,6 @@ package com.dustin.finledger.ledger.domain.journal;
 
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Currency;
@@ -29,7 +28,7 @@ import com.dustin.finledger.common.money.Money;
 public class JournalEntry {
     private final JournalEntryId id;
     private final String description;
-    private final LocalDateTime timestamp;
+    private final Instant timestamp;
     private final List<JournalLine> lines;
     private boolean posted;
 
@@ -52,7 +51,7 @@ public class JournalEntry {
     public JournalEntry(JournalEntryId id, String description) {
         this.id = Objects.requireNonNull(id);
         this.description = description;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
         this.lines = new ArrayList<>();
         this.posted = false;
     }
@@ -157,7 +156,7 @@ public class JournalEntry {
     public String getDescription() {
         return description;
     }
-    public LocalDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
     public List<JournalLine> getLines() {

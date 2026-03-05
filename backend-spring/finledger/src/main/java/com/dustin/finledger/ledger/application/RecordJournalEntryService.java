@@ -41,16 +41,20 @@ public class RecordJournalEntryService {
 
         for (JournalLineCommand lineCmd : command.lines()) {
 
-            AccountId accountId = new AccountId(lineCmd.accountId());
+            AccountId accountId = lineCmd.accountId();
             
             Account account = accountRepository.getById(accountId)
                 .orElseThrow(() -> new DomainException(
                     "Account not found:" + lineCmd.accountId()
-                ));
+            ));
             
             account.ensureCanPost();
 
             Currency currency = Currency.getInstance(lineCmd.currency());
+                
+            if (!account.getCurrency().equals(currency)) {
+                throw new DomainException("Currency mismatch for account: " + account.getId());
+            }
 
             Money money = Money.of(lineCmd.amount(), currency);
             

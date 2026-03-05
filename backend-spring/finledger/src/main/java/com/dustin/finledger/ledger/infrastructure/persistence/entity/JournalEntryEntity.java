@@ -1,6 +1,6 @@
 package com.dustin.finledger.ledger.infrastructure.persistence.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +28,7 @@ public class JournalEntryEntity {
     private String description;
 
     @Column(name = "timestamp", nullable = false)
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "journal_entry_id")
@@ -39,7 +39,7 @@ public class JournalEntryEntity {
     
     protected JournalEntryEntity() {};
 
-    public JournalEntryEntity(UUID id, String description, LocalDateTime timestamp, List<JournalLineEntity> lines, boolean posted){
+    public JournalEntryEntity(UUID id, String description, Instant timestamp, List<JournalLineEntity> lines, boolean posted){
         this.id = id;
         this.description  = description;
         this.timestamp = timestamp;
@@ -73,7 +73,7 @@ public class JournalEntryEntity {
 
     public UUID getId() {  return id;  }
     public String getDescription() { return description; }
-    public LocalDateTime getTimestamp() { return timestamp; }
+    public Instant getTimestamp() { return timestamp; }
     public List<JournalLineEntity> getLines() { return lines; }
     public boolean getPosted() { return posted; }
 }
