@@ -22,8 +22,8 @@ This project emphasizes **clean architecture**, **domain modeling**, and **finte
 
 **Backend**
 - Java 21
-- Spring Boot,
-- PostgreSQL
+- Spring Boot
+- H2 (can switch tot PostgreSQL)
 - JPA / Hibernate
 - JUnit, Mockito, AssertJ
 

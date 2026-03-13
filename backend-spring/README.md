@@ -1,23 +1,26 @@
 # FinLedger
 
-FinLedger is a backend ledger system implementing double-entry accounting using domain-driven design (DDD) principles. The project demonstrates a production-style
-Java backend with layered architecture, strong domain invariants, and test-driven development.
+FinLedger is a backend ledger system implementing double-entry accounting using domain-driven design (DDD) principles. 
+The project demonstrates a production-style Java backend with layered architecture, strong domain invariants, and test-driven development.
 
 ---
 
 ## Tech Stack
 - Java 21
+- Spring Boot
 - Maven
-- PostgreSQL
 - JPA / Hibernate
+- H2 Database
 - JUnit 5
 - Mockito
 - AssertJ
 
+The backend uses an in-memory H2 database for quick local development. Switching to PostgreSQL is straightforward by updating application.properties and adding the driver dependency.
+
 ---
 
 ## Purpose
-The backend manages financial transactions while enforcing strict accounting invariants. It demonstrates:
+The backend manages financial transactions while enforcing strict double-entry accounting invariants. It demonstrates:
 - Domain-driven design (DDD)
 - Aggregate modeling
 - Repository abstraction
@@ -42,15 +45,14 @@ The backend follows a layered architecture:
 
 api/            Controllers and request/response DTOs
 
+api/errors      Global exception handling for API responses
+
 application/    Application services coordinating domain logic
 
 domain/         Core business logic and aggregates
 
 infrastructure/ Persistence adapters (JPA repositories)
 
----
-
-## System Architecture
 
 ```mermaid
 flowchart LR
@@ -75,7 +77,7 @@ end
 
 subgraph Infrastructure Layer
 Repository
-Database[(PostgreSQL)]
+Database[(H2)]
 end
 ```
 
@@ -120,6 +122,105 @@ GET     /accounts/{id}/balance
 
 ---
 
+## API Example Workflow
+
+### Create Account
+
+POST    /accounts
+
+Request:
+{
+    "name": "Cash",
+    "type": "ASSET",
+    "currency": "USD"
+}
+
+Response (201 Created):
+{
+    "id": "583d7031-8481-4cb7-9884-16b9fa1c4973",
+    "name": "Cash",
+    "type": "ASSET",
+    "status": "ACTIVE",
+    "currency": "USD"
+}
+
+
+### Record Transaction
+
+POST    /transactions
+
+Request:
+{
+  "description": "Coffee purchase",
+  "lines": [
+    {
+      "accountId": "cash-id",
+      "amount": 5.00,
+      "currency": "USD",
+      "side": "DEBIT",
+      "occurredAt": "2026-03-13T10:00:00Z"
+    },
+    {
+      "accountId": "revenue-id",
+      "amount": 5.00,
+      "currency": "USD",
+      "side": "CREDIT",
+      "occurredAt": "2026-03-13T10:00:00Z"
+    }
+  ]
+}
+
+Response:
+201 Created
+Location: /transactions/{id}
+
+### Get Account Balance
+
+GET     /accounts/{id}/balance
+
+Response:
+{
+    "accountId": "cash-id",
+    "amount": 5.00,
+    "currency": "USD"
+}
+
+### Reverse Transaction
+
+POST /transactions/{id}/reverse
+
+Response:
+
+{
+  "description": "Coffee purchase",
+  "lines": [
+    {
+      "accountId": "cash-id",
+      "amount": 5.00,
+      "currency": "USD",
+      "side": "CREDIT"
+    },
+    {
+      "accountId": "revenue-id",
+      "amount": 5.00,
+      "currency": "USD",
+      "side": "DEBIT"
+    }
+  ],
+  "posted": true
+}
+
+
+curl -X POST http://localhost:8080/accounts \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Cash",
+  "type": "ASSET",
+  "currency": "USD"
+}'
+
+---
+
 ## Domain Rules
 
 The ledger enforces strict accounting invariants:
@@ -148,10 +249,9 @@ mvn test
 
 ## Running the backend
 
-1. Ensure PostgreSQL is running and configured
-2. Navigate to the backend folder:
+1. Navigate to the backend folder:
     `cd backend-spring`
-3. Start the application:
+2. Start the application:
     `mvn spring-boot:run`
 
 ---
@@ -160,6 +260,7 @@ mvn test
 
 - Authentication and authorization
 - Transaction pagination
+- Idempotent transacttion endpoints
 - Audit logging
 - Multi-currency account support
 - Frontend UI
