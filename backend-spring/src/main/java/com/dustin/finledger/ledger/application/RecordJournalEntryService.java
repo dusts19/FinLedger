@@ -62,7 +62,7 @@ public class RecordJournalEntryService {
                 ? lineCmd.occurredAt()
                 : Instant.now();
             
-            EntrySide side = EntrySide.valueOf(lineCmd.side());
+            EntrySide side = EntrySide.valueOf(lineCmd.side().toUpperCase());
 
             JournalLine line = new JournalLine(
                 JournalLineId.newId(),
