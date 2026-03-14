@@ -42,4 +42,12 @@ public enum AccountType {
     public boolean increasesWith(EntrySide side) {
         return this.normalBalanceSide == side;
     }
+
+    public static AccountType fromString(String value) {
+        try {
+            return AccountType.valueOf(value.toUpperCase().trim());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid account type: " + value);
+        }
+    }
 }

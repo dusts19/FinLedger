@@ -23,7 +23,7 @@ public class CreateAccountService {
 
     public AccountId handle(CreateAccountCommand command) {
 
-        AccountType type = AccountType.valueOf(command.type());
+        AccountType type = AccountType.fromString(command.type());
 
         Currency currency = Currency.getInstance(command.currencyCode());
 
