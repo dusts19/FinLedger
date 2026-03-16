@@ -1,8 +1,12 @@
 # FinLedger
 
-Backend-focused fintech ledger built with Spring Boot and domain-driven design.
+Status: Demo API deployed using Railway (H2 in-memory database)
 
-FinLedger is a full-stack personal finance tracker built around a **double-entry accounting ledger**. The project demonstrate backend-focused engineering practices including domain-driven design (DDD), layered architecture, and strong domain invariants.
+Backend-focused fintech ledger built with Spring Boot and domain-driven design (DDD).
+
+FinLedger is a personal finance system built around a **double-entry accounting ledger**. The project demonstrates backend-focused engineering practices including **domain-driven design (DDD), layered architecture, and strong domain invariants**.
+
+The backend is fully implemented and deployed as a live demo API.A frontend UI is planned but not yet implemented.
 
 ---
 
@@ -10,7 +14,7 @@ FinLedger is a full-stack personal finance tracker built around a **double-entry
 
 FinLedger allows users to:
 
-- Track income and expenses across multiple accounts.
+- Track income and expenses across multiple accounts
 - Maintain accurate account balances using double-entry accounting
 - Record and reverse financial transactions
 
@@ -20,20 +24,34 @@ This project emphasizes **clean architecture**, **domain modeling**, and **finte
 
 ## Tech Stack
 
-**Backend**
+### Backend
 - Java 21
 - Spring Boot
-- H2 (can switch tot PostgreSQL)
+- H2 (can switch to PostgreSQL)
 - JPA / Hibernate
 - JUnit, Mockito, AssertJ
 
-**Frontend (planned)**
+### Frontend (planned)
 - React
 - TypeScript
 
 ---
 
+```mermaid
+flowchart LR
+
+Frontend[Reactt Frontend (Planned)] --> Backend[Spring Boot API]
+
+Backend --> Domain[Domain Layer<br>Accounts / JournalEntry / JournalLine]
+
+Backend --> Database[(Database)]
+```
+
+---
+
 ## Project Structure
+
+```
 finledger/
 │
 ├── backend/    Spring Boot ledger API
@@ -41,6 +59,7 @@ finledger/
 ├── frontend/   Planned React frontend
 │
 └── README.md
+```
 
 The backend contains the core financial ledger implementation including:
 
@@ -50,12 +69,24 @@ The backend contains the core financial ledger implementation including:
 - Balance calculation
 - REST API endpoints
 
+See the `/backend-spring` folder for detailed documentation.
+
+---
+
+## Live Demo
+
+Backend API demo:
+
+https://finledger-production.up.railway.app
+
+This demo runs with an in-memory H2 database and is intended for testing the API.
+
 ---
 
 ## Running locally
 
 ### Backend
-    `cd backend-spring/finledger`
+    `cd backend-spring`
     `mvn spring-boot:run`
 ### Frontend (planned)
     `cd frontend-next`
@@ -68,10 +99,10 @@ The backend contains the core financial ledger implementation including:
 
 The backend follows a layered architecture:
 
-api/            REST controllers and DTOs
-application/    Application services
-domain/         Core business logic and aggregates
-infrastructure/ Persistence adapters (JPA repositories)
+`api/            REST controllers and DTOs`
+`application/    Application services`
+`domain/         Core business logic and aggregates`
+`infrastructure/ Persistence adapters (JPA repositories)`
 
 The ledger enforces strict accounting rules:
 
@@ -88,4 +119,4 @@ The ledger enforces strict accounting rules:
 - Domain rules are enforced through domain models rather than controllers
 - The project focuses on backend architecture and financial ledger correctness
 
-For more details see the backend documentation in `/backend`.
+For more details see the backend documentation in `/backend-spring`.
