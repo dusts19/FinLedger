@@ -40,7 +40,7 @@ This project emphasizes **clean architecture**, **domain modeling**, and **finte
 ```mermaid
 flowchart LR
 
-Frontend[Reactt Frontend (Planned)] --> Backend[Spring Boot API]
+Frontend[React Frontend (Planned)] --> Backend[Spring Boot API]
 
 Backend --> Domain[Domain Layer<br>Accounts / JournalEntry / JournalLine]
 

@@ -73,16 +73,17 @@ The backend uses an in-memory H2 database for quick local development. Switching
 
 The backend follows a layered architecture:
 
-`api/            Controllers and request/response DTOs`
+```
+api/            Controllers and request/response DTOs
 
-`api/errors      Global exception handling for API responses`
+api/errors      Global exception handling for API responses
 
-`application/    Application services coordinating domain logic`
+application/    Application services coordinating domain logic
 
-`domain/         Core business logic and aggregates`
+domain/         Core business logic and aggregates
 
-`infrastructure/ Persistence adapters (JPA repositories)`
-
+infrastructure/ Persistence adapters (JPA repositories)
+```
 
 
 ```mermaid
@@ -116,7 +117,7 @@ end
 
 ## Domain Model
 
-```Mermaid
+```mermaid
 classDiagram
 
 class Account {
@@ -189,10 +190,13 @@ The domain model uses consistent terminology from accounting systems.
 
 src/main/java/com/dustin/finledger
 
-`api/            REST controllers and DTOs`
-`application/    Application services and commands`
-`domain/         Core domain logic and aggregates`
-`infrastructure/ JPA repositories and persistence adapters`
+api/             REST controllers and DTOs
+
+application/     Application services and commands
+
+domain/          Core domain logic and aggregates
+
+infrastructure/  JPA repositories and persistence adapters
 
 ---
 
@@ -335,6 +339,7 @@ Response:
 }
 ```
 
+### Curl Example
 
 ```
 curl -X POST https://finledger-production.up.railway.app/accounts \
@@ -370,15 +375,18 @@ The project includes multiple layers of tests:
 
 Run tests with:
 
-mvn test
+    `mvn test`
 
 ---
 
 ## Running the backend
 
 1. Navigate to the backend folder:
+
     `cd backend-spring`
+
 2. Start the application:
+
     `mvn spring-boot:run`
 
 ---
@@ -387,7 +395,7 @@ mvn test
 
 - Authentication and authorization
 - Transaction pagination
-- Idempotent transaction endpoints
-- Audit logging
+- Idempotent transaction endpoints (Idempotency-Key header) to prevent duplicate postings during retries
+- Audit logging for ledger events
 - Multi-currency account support
 - Frontend UI
